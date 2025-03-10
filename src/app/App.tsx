@@ -126,7 +126,7 @@ export default function App() {
 			uAtmosphereTwilightColor: new Uniform(new Color('#ff6600')),
 
 			uSunDirection: new Uniform(new Vector3(0, 0, 1)),
-			uSunRadius: new Uniform(5.0),
+			uSunRadius: new Uniform(5),
 		};
 
 		// Earth
@@ -143,7 +143,9 @@ export default function App() {
 		// Sun
 		const sun = new Mesh(
 			new IcosahedronGeometry(0.1, 3),
-			new MeshBasicMaterial()
+			new MeshBasicMaterial({
+				depthWrite: false,
+			})
 		);
 		scene.add(sun);
 
@@ -152,11 +154,11 @@ export default function App() {
 		scene.add(pointLight);
 
 		const lensflare = new Lensflare();
-		lensflare.addElement(
-			new LensflareElement(lensflareTexture0, 700, 0, pointLight.color)
-		);
+		lensflare.addElement(new LensflareElement(lensflareTexture0, 700, 0));
+		lensflare.addElement(new LensflareElement(lensflareTexture2, 600, 0.6));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 60, 0.6));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 70, 0.7));
+		lensflare.addElement(new LensflareElement(lensflareTexture2, 700, 0.7));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 120, 0.9));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 70, 1));
 
