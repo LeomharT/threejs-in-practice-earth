@@ -7,6 +7,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
+	PointLight,
 	Scene,
 	ShaderMaterial,
 	SphereGeometry,
@@ -17,7 +18,12 @@ import {
 	Vector3,
 	WebGLRenderer,
 } from 'three';
-import { GroundedSkybox, OrbitControls } from 'three/examples/jsm/Addons.js';
+import {
+	GroundedSkybox,
+	Lensflare,
+	LensflareElement,
+	OrbitControls,
+} from 'three/examples/jsm/Addons.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { Pane } from 'tweakpane';
 import atmosphereFragmentShader from '../shader/atmosphere/fragment.glsl?raw';
@@ -94,6 +100,11 @@ export default function App() {
 		earthCloudsTexture.colorSpace = SRGBColorSpace;
 		earthCloudsTexture.anisotropy = 8;
 
+		const lensflareTexture0 = textureLoader.load('lensflare0.png');
+		const lensflareTexture1 = textureLoader.load('lensflare1.png');
+		const lensflareTexture2 = textureLoader.load('lensflare2.png');
+		const lensflareTexture3 = textureLoader.load('lensflare3.png');
+
 		/**
 		 * Scene
 		 */
@@ -119,7 +130,6 @@ export default function App() {
 		};
 
 		// Earth
-
 		const earthGeometry = new SphereGeometry(2, 64, 64);
 		const earthMaterial = new ShaderMaterial({
 			vertexShader: earthVertexShader,
@@ -130,11 +140,27 @@ export default function App() {
 		const earth = new Mesh(earthGeometry, earthMaterial);
 		scene.add(earth);
 
+		// Sun
 		const sun = new Mesh(
 			new IcosahedronGeometry(0.1, 3),
 			new MeshBasicMaterial()
 		);
 		scene.add(sun);
+
+		// Lensflare
+		const pointLight = new PointLight(0xffffff, 1.0);
+		scene.add(pointLight);
+
+		const lensflare = new Lensflare();
+		lensflare.addElement(
+			new LensflareElement(lensflareTexture0, 700, 0, pointLight.color)
+		);
+		lensflare.addElement(new LensflareElement(lensflareTexture3, 60, 0.6));
+		lensflare.addElement(new LensflareElement(lensflareTexture3, 70, 0.7));
+		lensflare.addElement(new LensflareElement(lensflareTexture3, 120, 0.9));
+		lensflare.addElement(new LensflareElement(lensflareTexture3, 70, 1));
+
+		pointLight.add(lensflare);
 
 		function updateSun() {
 			// Sun
@@ -142,6 +168,9 @@ export default function App() {
 
 			// Debug
 			sun.position.copy(sunDirection).multiplyScalar(uniforms.uSunRadius.value);
+			pointLight.position
+				.copy(sunDirection)
+				.multiplyScalar(uniforms.uSunRadius.value);
 
 			// Uniform
 			uniforms.uSunDirection.value.copy(sunDirection);
