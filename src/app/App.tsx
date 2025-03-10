@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import {
+	BackSide,
 	Color,
 	EquirectangularReflectionMapping,
 	IcosahedronGeometry,
@@ -19,6 +20,8 @@ import {
 import { GroundedSkybox, OrbitControls } from 'three/examples/jsm/Addons.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { Pane } from 'tweakpane';
+import atmosphereFragmentShader from '../shader/atmosphere/fragment.glsl?raw';
+import atmosphereVertexShader from '../shader/atmosphere/vertex.glsl?raw';
 import earthFragmentShader from '../shader/earth/fragment.glsl?raw';
 import earthVertexShader from '../shader/earth/vertex.glsl?raw';
 const ASSETS_PATH = import.meta.env.PROD ? './' : '/';
@@ -127,9 +130,6 @@ export default function App() {
 		const earth = new Mesh(earthGeometry, earthMaterial);
 		scene.add(earth);
 
-		const skyBox = new GroundedSkybox(milkyWayTexture, 15, 125, 256);
-		scene.add(skyBox);
-
 		const sun = new Mesh(
 			new IcosahedronGeometry(0.1, 3),
 			new MeshBasicMaterial()
@@ -147,6 +147,23 @@ export default function App() {
 			uniforms.uSunDirection.value.copy(sunDirection);
 		}
 		updateSun();
+
+		// Atmosphere
+		const atmosphereGeometry = new SphereGeometry(2, 64, 64);
+		const atmosphereMaterial = new ShaderMaterial({
+			vertexShader: atmosphereVertexShader,
+			fragmentShader: atmosphereFragmentShader,
+			uniforms,
+			transparent: true,
+			side: BackSide,
+		});
+		const atmosphere = new Mesh(atmosphereGeometry, atmosphereMaterial);
+		atmosphere.scale.setScalar(1.04);
+		scene.add(atmosphere);
+
+		// Sky Box
+		const skyBox = new GroundedSkybox(milkyWayTexture, 15, 125, 256);
+		scene.add(skyBox);
 
 		/**
 		 * Pane
