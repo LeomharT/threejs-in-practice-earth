@@ -7,7 +7,6 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
-	PointLight,
 	Scene,
 	ShaderMaterial,
 	SphereGeometry,
@@ -151,8 +150,6 @@ export default function App() {
 		scene.add(sun);
 
 		// Lensflare
-		const pointLight = new PointLight(0xffffff, 1.0);
-		scene.add(pointLight);
 
 		const lensflare = new Lensflare();
 		lensflare.addElement(new LensflareElement(lensflareTexture0, 700, 0));
@@ -162,8 +159,7 @@ export default function App() {
 		lensflare.addElement(new LensflareElement(lensflareTexture2, 700, 0.7));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 120, 0.9));
 		lensflare.addElement(new LensflareElement(lensflareTexture3, 70, 1));
-
-		pointLight.add(lensflare);
+		sun.add(lensflare);
 
 		function updateSun() {
 			// Sun
@@ -171,9 +167,6 @@ export default function App() {
 
 			// Debug
 			sun.position.copy(sunDirection).multiplyScalar(uniforms.uSunRadius.value);
-			pointLight.position
-				.copy(sunDirection)
-				.multiplyScalar(uniforms.uSunRadius.value);
 
 			// Uniform
 			uniforms.uSunDirection.value.copy(sunDirection);
