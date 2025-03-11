@@ -68,6 +68,8 @@ export default function App() {
 
 		const controls = new OrbitControls(camera, renderer.domElement);
 		controls.enableDamping = true;
+		controls.enablePan = false;
+		controls.enableZoom = false;
 
 		const stats = new Stats();
 		el.append(stats.dom);
@@ -101,7 +103,6 @@ export default function App() {
 		earthCloudsTexture.anisotropy = 8;
 
 		const lensflareTexture0 = textureLoader.load('lensflare0.png');
-		const lensflareTexture1 = textureLoader.load('lensflare1.png');
 		const lensflareTexture2 = textureLoader.load('lensflare2.png');
 		const lensflareTexture3 = textureLoader.load('lensflare3.png');
 
@@ -193,7 +194,7 @@ export default function App() {
 		scene.add(atmosphere);
 
 		// Sky Box
-		const skyBox = new GroundedSkybox(milkyWayTexture, 15, 125, 256);
+		const skyBox = new GroundedSkybox(milkyWayTexture, 75, 125, 512);
 		scene.add(skyBox);
 
 		/**
