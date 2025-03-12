@@ -7,6 +7,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PerspectiveCamera,
+	RepeatWrapping,
 	Scene,
 	ShaderMaterial,
 	SphereGeometry,
@@ -100,6 +101,11 @@ export default function App() {
 		const earthCloudsTexture = textureLoader.load('specularClouds.jpg');
 		earthCloudsTexture.colorSpace = SRGBColorSpace;
 		earthCloudsTexture.anisotropy = 8;
+		earthCloudsTexture.wrapS = earthCloudsTexture.wrapT = RepeatWrapping;
+
+		const noiseTexture = textureLoader.load('perlin.png');
+		noiseTexture.wrapS = noiseTexture.wrapT = RepeatWrapping;
+		noiseTexture.repeat.set(10, 10);
 
 		const lensflareTexture0 = textureLoader.load('lensflare0.png');
 		const lensflareTexture2 = textureLoader.load('lensflare2.png');
@@ -113,14 +119,17 @@ export default function App() {
 		const sunDirection = new Vector3();
 
 		const uniforms = {
+			uTime: new Uniform(0.0),
+
 			uEarthDayMapTexture: new Uniform(earthDayMapTexture),
 			uEarthNightMapTexture: new Uniform(earthNightMapTexture),
 			uSpecularCloudsTexture: new Uniform(earthCloudsTexture),
+			uNoiseTexture: new Uniform(noiseTexture),
 
 			uDayMixRemapEdge0: new Uniform(-0.25),
 			uDayMixRemapEdge1: new Uniform(0.5),
 
-			uCloudsVolumn: new Uniform(0.25),
+			uCloudsVolumn: new Uniform(0),
 
 			uAtmosphereDayColor: new Uniform(new Color('#00aaff')),
 			uAtmosphereTwilightColor: new Uniform(new Color('#ff6600')),
@@ -292,6 +301,7 @@ export default function App() {
 			controls.update(time);
 
 			earth.rotation.y += 0.001;
+			uniforms.uTime.value += 0.001;
 
 			renderer.render(scene, camera);
 		}

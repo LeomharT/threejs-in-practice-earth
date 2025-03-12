@@ -5,11 +5,13 @@ varying vec2 vUv;
 uniform sampler2D uEarthDayMapTexture;
 uniform sampler2D uEarthNightMapTexture;
 uniform sampler2D uSpecularCloudsTexture;
+uniform sampler2D uNoiseTexture;
 
 uniform vec3 uSunDirection;
 uniform vec3 uAtmosphereDayColor;
 uniform vec3 uAtmosphereTwilightColor;
 
+uniform float uTime;
 uniform float uDayMixRemapEdge0;
 uniform float uDayMixRemapEdge1;
 uniform float uCloudsVolumn;
@@ -43,8 +45,15 @@ void main()
     );
 
     // Clouds
+    vec4 noise = texture2D(uNoiseTexture, vec2(0.5, uTime * 0.25));
+
+    vec2 cloudsUV = uv;
+    cloudsUV.x -= uTime * 0.125;
+   
+    vec2 cloudsMap = texture2D(uSpecularCloudsTexture, cloudsUV).rg;
     vec2 specularCloudMap = texture2D(uSpecularCloudsTexture, uv).rg;
-    float cloudMix = smoothstep(uCloudsVolumn, 1.0, specularCloudMap.g);
+
+    float cloudMix = smoothstep(noise.r, 1.0, cloudsMap.g);
     cloudMix *= dayMix;
 
     color = mix(
